@@ -29,9 +29,10 @@ func main() {
 		os.Exit(2)
 	}
 
-	ctx := context.Background()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*time.Duration(*uploadTimeoutSecs))
+	defer cancel()
 
-	uri, err := uploadImage(ctx, *imageFile, *gcsBucket, time.Second*time.Duration(*uploadTimeoutSecs))
+	uri, err := uploadImage(ctx, *imageFile, *gcsBucket)
 	if err != nil {
 		fmt.Printf("Error uploading the image %v to bucket %v: %v\n", *imageFile, *gcsBucket, err)
 		return
@@ -62,7 +63,7 @@ func main() {
 	fmt.Printf("%v\n", res)
 }
 
-func uploadImage(ctx context.Context, imageFile, bucket string, timeout time.Duration) (string, error) {
+func uploadImage(ctx context.Context, imageFile, bucket string) (string, error) {
 	sc, err := storage.NewClient(ctx)
 	if err != nil {
 		return "", fmt.Errorf("Error creating the storage client: %v", err)
@@ -74,9 +75,6 @@ func uploadImage(ctx context.Context, imageFile, bucket string, timeout time.Dur
 		return "", fmt.Errorf("Error opening image file %v: %v", imageFile, err)
 	}
 	defer imageFileHandle.Close()
-
-	ctx, cancel := context.WithTimeout(ctx, timeout)
-	defer cancel()
 
 	object := sc.Bucket(bucket).Object(path.Base(imageFile))
 	writer := object.NewWriter(ctx)
