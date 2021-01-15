@@ -9,7 +9,7 @@ A simple client program to play around with [Cloud Vision](https://cloud.google.
 ## Create a GCS Bucket
 
 1. `gsutil mb gs://cloud-vision-api-client-test-001`
-2. Set retention to 5 minutes: `gsutil retention set 300s gs://cloud-vision-api-client-test-001/`
-   * Check whether retention is set: `gsutil retention get gs://cloud-vision-api-client-test-001/`
+2. Set bucket's lifecycle to delete all objects older than 1 day: `gsutil lifecycle set bucket-lifecycle.json gs://cloud-vision-api-client-test-001/`
+   * Check bucket's lifecycle: `gsutil lifecycle get gs://cloud-vision-api-client-test-001/`
 3. Disable versioning: `gsutil versioning set off gs://cloud-vision-api-client-test-001/`
    * Check whether versioning is disabled: `gsutil versioning get gs://cloud-vision-api-client-test-001/`
